@@ -1,13 +1,19 @@
 from bs4 import BeautifulSoup
 from PIL import Image
 from io import BytesIO
+
 import requests
 import os
+import time
 
 class scraper(object):
 
     def __init__(self):
+        self.perc_downloaded = 0
         print("Nhentai-Scraper initialized")
+
+    def get_perc (self):
+        return self.perc_downloaded
 
     def scrape_comic(self, nh_index):
         url = "https://nhentai.net/g/{0}/".format(nh_index)
@@ -20,6 +26,8 @@ class scraper(object):
             cover_meta_image = soup.find('meta', {"itemprop" : "image"})
             cover_link = cover_meta_image.get('content')
 
+            if('|' in cover_name):
+                cover_name = cover_name.replace('|', '')
             os.mkdir(cover_name)
 
             try:
@@ -31,7 +39,12 @@ class scraper(object):
                 print()
 
             _index = 0
+            manga_length = len(soup.find_all('div', {"class" : "thumb-container"}))
+
             for i in soup.find_all('div', {"class" : "thumb-container"}):
+
+                time.sleep(0.25)
+
                 img_link = 'https://nhentai.net' + i.a.get('href')
                 page_req = requests.get(img_link).text
                 img_soup = BeautifulSoup(page_req, 'html5lib')
@@ -45,6 +58,7 @@ class scraper(object):
                     img_data_buffer = BytesIO(r)
                     img = Image.open(img_data_buffer).convert("RGBA")
                     img.save("{0}/{1}.png".format(cover_name, _index))
-                    # print percent downloaded
+
+                    self.perc_downloaded = (_index / manga_length) * 100
                 except:
                     print()
