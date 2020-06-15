@@ -5,6 +5,7 @@ from tkinter import messagebox
 from tkinter.ttk import Progressbar
 
 import re
+import os
 import scraper
 import threading
 
@@ -24,9 +25,10 @@ def interface ():
     root.geometry("300x400")
     root.configure(bg='#101010')
     root.resizable(False, False)
-    root.iconbitmap('res/ahegao.ico')
+    cur_dir = os.getcwd()
+    root.iconbitmap('{0}/res/ahegao.ico'.format(cur_dir))
 
-    photo = tk.PhotoImage(file = "res/collage1.png")
+    photo = tk.PhotoImage(file = "{0}/res/collage1.png".format(cur_dir))
 
     w = tk.Label(root, image=photo)
     w.pack()

@@ -5,6 +5,7 @@ from io import BytesIO
 import requests
 import os
 import time
+import checkname
 
 class scraper(object):
 
@@ -26,15 +27,16 @@ class scraper(object):
             cover_meta_image = soup.find('meta', {"itemprop" : "image"})
             cover_link = cover_meta_image.get('content')
 
-            if('|' in cover_name):
-                cover_name = cover_name.replace('|', '')
-            os.mkdir(cover_name)
+            cover_name = checkname.fixname(cover_name)
+            dir_loc = os.path.expanduser("~/Desktop")
+            folder = '{0}/{1}'.format(dir_loc, cover_name)
+            os.mkdir(folder)
 
             try:
                 cover_request = requests.get(cover_link).content
                 cover_image_buffer = BytesIO(cover_request)
                 cover_image = Image.open(cover_image_buffer).convert("RGBA")
-                cover_image.save("{0}/cover.png".format(cover_name))
+                cover_image.save("{0}/cover.png".format(folder))
             except:
                 print()
 
@@ -57,7 +59,7 @@ class scraper(object):
                     r = requests.get(_link).content
                     img_data_buffer = BytesIO(r)
                     img = Image.open(img_data_buffer).convert("RGBA")
-                    img.save("{0}/{1}.png".format(cover_name, _index))
+                    img.save("{0}/{1}.png".format(folder, _index))
 
                     self.perc_downloaded = (_index / manga_length) * 100
                 except:
